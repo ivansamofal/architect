@@ -1,0 +1,23 @@
+QUIET := @
+ARGS=$(filter-out $@, $(MAKECMDGOALS))
+
+.DEFAULT_GOAL=help
+.PHONY=help
+app_container=php
+
+init-db: ## Проинициализировать БД
+	$(QUIET) chmod 774 ./config/postgrespro/bin/initdb.sh
+	$(QUIET) ./config/postgrespro/bin/initdb.sh
+
+cmp-install: ## Установить пакеты
+	$(QUIET) docker-compose run --rm --no-deps webapp composer install
+
+cmp-update: ## Обновить пакеты
+	$(QUIET) docker-compose run --rm --no-deps webapp composer update ${ARGS}
+
+shell-php: ## Войти в php-контейнер
+	docker-compose run --rm --no-deps webapp /bin/sh
+
+entity:
+	php bin/console make:entity
+
