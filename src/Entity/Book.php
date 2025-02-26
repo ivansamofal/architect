@@ -16,8 +16,10 @@ class Book
     #[ORM\Column(length: 255)]
     private string $name;
 
-    #[ORM\Column(length: 255)]
-    private int $authorId;
+    // Связь с автором
+    #[ORM\ManyToOne(targetEntity: Author::class, inversedBy: 'books')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Author $author = null;
 
     #[ORM\Column]
     private int $year;
@@ -38,18 +40,6 @@ class Book
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getAuthorId(): string
-    {
-        return $this->authorId;
-    }
-
-    public function setAuthorId(string $authorId): self
-    {
-        $this->authorId = $authorId;
 
         return $this;
     }
@@ -76,5 +66,17 @@ class Book
         $this->active = $active;
 
         return $this;
+    }
+
+    public function setAuthor(?Author $author): self
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?Author
+    {
+        return $this->author;
     }
 }
