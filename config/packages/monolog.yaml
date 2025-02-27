@@ -1,0 +1,16 @@
+# config/packages/monolog.yaml
+monolog:
+  channels: ['app']
+  handlers:
+    # Log to a file
+    main:
+      type: stream
+      path: '%kernel.logs_dir%/%kernel.environment%.log'
+      level: info
+      channels: ['!event', '!doctrine']
+    # Log errors to a separate file
+    error:
+      type: stream
+      path: '%kernel.logs_dir%/error.log'
+      level: error
+      channels: ['app']

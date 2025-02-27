@@ -21,3 +21,9 @@ shell-php: ## Войти в php-контейнер
 entity:
 	php bin/console make:entity
 
+mi-generate:
+	php bin/console doctrine:migrations:generate
+
+migrate:
+	php bin/console --no-interaction doctrine:migrations:migrate
+

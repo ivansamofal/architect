@@ -17,11 +17,9 @@ services:
       - "80:80"
       - "443:443"
     networks:
-      - network
+      - architecht_network
 
   webapp:
-    #    build:
-    #      context: ./infrastructure/dev/php
     image: taygeta/php:8.3
     container_name: webapp
     env_file:
@@ -38,8 +36,9 @@ services:
       - "./config/infrastructure/php/php.ini:/usr/local/etc/php/php.ini"
     depends_on:
       - database
+      - rabbitmq
     networks:
-      - network
+      - architecht_network
     extra_hosts:
       - "registry.yarnpkg.com:104.16.16.35"
 
@@ -59,11 +58,29 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - network
+      - architecht_network
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:3.12-management"
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+      TZ: "Europe/Moscow"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - architecht_network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 networks:
-  network:
+  architecht_network:
+    external: true
 
 volumes:
   data:
   database_data:
+  rabbitmq_data:

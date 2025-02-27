@@ -10,16 +10,23 @@
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.14",
-        "symfony/console": "6.2.*",
-        "symfony/dotenv": "6.2.*",
+        "enqueue/amqp-bunny": "^0.10.19",
+        "enqueue/amqp-ext": "^0.10.21",
+        "php-amqplib/rabbitmq-bundle": "^2.17",
+        "psr/log": "^3.0",
+        "symfony/amqp-messenger": "^7.0",
+        "symfony/console": "^7.0",
+        "symfony/dotenv": "^7.0",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "6.2.*",
-        "symfony/property-access": "6.2.*",
-        "symfony/runtime": "6.2.*",
-        "symfony/security-bundle": "6.2.*",
-        "symfony/serializer": "6.2.*",
-        "symfony/twig-bundle": "6.2.*",
-        "symfony/yaml": "6.2.*"
+        "symfony/framework-bundle": "^7.0",
+        "symfony/messenger": "^7.0",
+        "symfony/monolog-bundle": "^3.10",
+        "symfony/property-access": "^7.0",
+        "symfony/runtime": "^7.0",
+        "symfony/security-bundle": "^7.0",
+        "symfony/serializer": "^7.0",
+        "symfony/twig-bundle": "^7.0",
+        "symfony/yaml": "^7.0"
     },
     "config": {
         "allow-plugins": {
@@ -66,7 +73,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.2.*"
+            "require": "^7.0"
         }
     },
     "require-dev": {

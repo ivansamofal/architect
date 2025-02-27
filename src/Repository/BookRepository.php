@@ -54,10 +54,11 @@ class BookRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Book
+//    public function findAllByAuthorId($value): ?Book
 //    {
 //        return $this->createQueryBuilder('b')
-//            ->andWhere('b.exampleField = :val')
+//            ->leftJoin('b.author', 'a')->addSelect('a')
+//            ->andWhere('a. = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
 //            ->getOneOrNullResult()

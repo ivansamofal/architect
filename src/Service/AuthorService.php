@@ -6,7 +6,7 @@ use App\Repository\AuthorRepository;
 
 class AuthorService
 {
-    public function __construct(private AuthorRepository $authorRepository)
+    public function __construct(private readonly AuthorRepository $authorRepository)
     {
 
     }

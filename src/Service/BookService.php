@@ -2,16 +2,24 @@
 
 namespace App\Service;
 
-use App\Entity\Book;
+use App\Entity\Author;
+use App\Factories\BookFactory;
+use App\Messages\LoadBooksMessage;
+use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
-use App\Repository\CountryRepository;
-use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class BookService
 {
+    private const DEFAULT_URL = 'https://www.googleapis.com/books/v1/volumes?q=author:%s&maxResults=%d';
+
     public function __construct(
-        private BookRepository $bookRepository,
+        private readonly BookRepository $bookRepository,
+        private readonly AuthorRepository $authorRepository,
+        private MessageBusInterface $bus,
+        private readonly LoggerInterface $logger,
     )
     {
 
@@ -20,31 +28,49 @@ class BookService
     public function loadBooksFromApi(array $authors): array
     {
         $result = [];
+        $this->logger->info('start executing loadBooksFromApi');
 
-        $defaultUrl = 'https://www.googleapis.com/books/v1/volumes?q=author:%s&maxResults=%d';
         foreach ($authors as $author) {
-            $fullName = urlencode("{$author->getName()} {$author->getSurname()}");
-            $url = sprintf($defaultUrl, $fullName, 40);
-            $data = file_get_contents($url);
-            $data = json_decode($data, true);
-            if (!empty($data['items'])) {
-                foreach ($data['items'] as $bookInfo) {
-                    $title = $bookInfo['volumeInfo']['title'];
-                    $dbBook = $this->bookRepository->findOneBy(['name' => $title]);
-                    if (!$dbBook) {
-                        $book = new Book();
-                        $book->setActive(true);
-                        $year = substr($bookInfo['volumeInfo']['publishedDate'] ?? 0, 0, 4);
-                        $book->setName($bookInfo['volumeInfo']['title']);
-                        $book->setAuthor($author);
-                        $book->setYear($year);
-                        $this->bookRepository->save($book, true);
-                        $result[] = $title;
-                    }
-                }
-            }
+            $this->bus->dispatch(new LoadBooksMessage($author));
         }
 
         return $result;
+    }
+
+    public function loadAndSaveBooksByAuthor(Author $author): void
+    {
+        $data = $this->getBooksByAuthor($author);
+
+        foreach ($data as $bookInfo) {
+            $title = $bookInfo['volumeInfo']['title'] ?? '';
+            $dbBook = $this->bookRepository->findOneBy(['name' => $title]);
+
+            if (!$dbBook) {
+                $year = (int) substr($bookInfo['volumeInfo']['publishedDate'] ?? 0, 0, 4);
+                $book = BookFactory::create($title, $year, $author);
+                $this->bookRepository->save($book, true);
+            }
+        }
+    }
+
+    public function getBooksByAuthor(Author $author, int $limit = 40): array
+    {
+        $fullName = urlencode("{$author->getName()} {$author->getSurname()}");
+        $url = sprintf(self::DEFAULT_URL, $fullName, $limit);
+        $data = file_get_contents($url);
+        $data = json_decode($data, true);
+
+        return $data['items'] ?? [];
+    }
+
+    public function getList(int $authorId): array
+    {
+        $author = $this->authorRepository->findOneBy(['id' => $authorId]);
+
+        if (!$author) {
+            throw new \Exception('author not found');
+        }
+
+        return $this->bookRepository->findBy(['author' => $author]);
     }
 }

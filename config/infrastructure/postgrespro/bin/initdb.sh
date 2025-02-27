@@ -7,7 +7,7 @@ APP_ROOT="$(cd "$ROOT" || exit;pwd)"
 PG_CONTAINER="taygeta/pgpro:14"
 PG_USER="admin"
 PG_USER_PASS="somepswd"
-PG_DB="bachatadata"
+PG_DB="app_db"
 PG_DATA_PATH="/var/lib/pgpro/std-14/data"
 
 DOCKER_VOLUME="database_data"
