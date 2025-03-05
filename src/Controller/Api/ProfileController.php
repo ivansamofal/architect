@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class ProfileController extends AbstractController
 {
-    public function __construct(private ProfileService $profileService)
+    public function __construct(private readonly ProfileService $profileService)
     {
     }
 

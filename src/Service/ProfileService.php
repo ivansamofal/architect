@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Dto\LocationDto;
 use App\Entity\Profile;
+use App\Factories\ProfileFactory;
 use App\Repository\CountryRepository;
 use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,10 +13,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class ProfileService
 {
     public function __construct(
-        private ProfileRepository $profileRepository,
-        private EntityManagerInterface $entityManager,
-        private UserPasswordHasherInterface $passwordHasher,
-        private CountryService $countryService,
+        private readonly ProfileRepository $profileRepository,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly CountryService $countryService,
+        private readonly CityService $cityService,
     )
     {
 
@@ -46,12 +48,17 @@ class ProfileService
     public function createProfile(array $data)
     {
         $country = $this->countryService->findByCode($data['country'] ?? '');
-        $profile = new Profile();
-        $profile->setName($data['name']);
-        $profile->setSurname($data['surname']);
-        $profile->setStatus(1);
-        $profile->setEmail($data['email']);
-        $profile->setCountry($country);
+        $city = $this->cityService->findByName($data['city'] ?? '');
+        $birthDate = new \DateTimeImmutable($data['birth_date']);
+        $profile = ProfileFactory::create(
+            $data['name'],
+            $data['surname'],
+            $data['email'],
+            $country,
+            $city,
+            $birthDate
+        );
+
         $hashedPassword = $this->passwordHasher->hashPassword($profile, $data['password']);
         $profile->setPassword($hashedPassword);
 

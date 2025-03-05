@@ -12,6 +12,7 @@
         "doctrine/orm": "^2.14",
         "enqueue/amqp-bunny": "^0.10.19",
         "enqueue/amqp-ext": "^0.10.21",
+        "lexik/jwt-authentication-bundle": "*",
         "php-amqplib/rabbitmq-bundle": "^2.17",
         "psr/log": "^3.0",
         "symfony/amqp-messenger": "^7.0",

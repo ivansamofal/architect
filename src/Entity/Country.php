@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Infrastructure\Interfaces\ArrayableInterface;
 use App\Infrastructure\Traits\ArrayableTrait;
 use App\Repository\CountryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
@@ -25,6 +27,13 @@ class Country implements ArrayableInterface
 
     #[ORM\Column(length: 3)]
     private ?string $alpha3 = null;
+
+    #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'city', cascade: ['remove'])]
+    private Collection $cities;
+
+    public function __construct() {
+        $this->cities = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -65,5 +74,10 @@ class Country implements ArrayableInterface
         $this->alpha3 = $alpha3;
 
         return $this;
+    }
+
+    public function getCities(): ArrayCollection
+    {
+        return $this->cities;
     }
 }

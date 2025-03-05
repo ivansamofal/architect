@@ -9,10 +9,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProfileRepository::class)]
-class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface
+class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface, UserInterface
 {
     use ArrayableTrait;
 
@@ -40,12 +42,20 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $longitude = null;
 
+    #[ORM\Column(type: 'date', nullable: true)]
+    #[Assert\Date]
+    private ?\DateTimeInterface $birthDate = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Country::class)]
     #[ORM\JoinColumn(name: 'country_id', referencedColumnName: 'id', nullable: true, onDelete: "SET NULL")]
     private ?Country $country = null;
+
+    #[ORM\ManyToOne(targetEntity: City::class)]
+    #[ORM\JoinColumn(name: 'city_id', referencedColumnName: 'id', nullable: true, onDelete: "SET NULL")]
+    private ?City $city = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $avatar_id = null; // Если это ID, а не связь с Avatar
@@ -56,7 +66,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $status = null;
 
-    #[ORM\Column]
+    #[ORM\Column(unique: true)]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -150,6 +160,17 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getCity(): ?City
+    {
+        return $this->city;
+    }
+
+    public function setCity(?City $city): self
+    {
+        $this->city = $city;
+        return $this;
+    }
+
     public function getAvatarId(): ?int
     {
         return $this->avatar_id;
@@ -213,5 +234,32 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface
     public function getPassword(): string
     {
         return $this->password;
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_ADMIN', 'ROLE_USER'];
+    }
+
+    public function eraseCredentials(): void
+    {
+
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function setBirthDate(\DateTimeInterface $dateTime): static
+    {
+        $this->birthDate = $dateTime;
+
+        return $this;
+    }
+
+    public function getBirthDate(): ?\DateTimeInterface
+    {
+        return $this->birthDate;
     }
 }

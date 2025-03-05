@@ -18,7 +18,7 @@ class BookService
     public function __construct(
         private readonly BookRepository $bookRepository,
         private readonly AuthorRepository $authorRepository,
-        private MessageBusInterface $bus,
+        private readonly MessageBusInterface $bus,
         private readonly LoggerInterface $logger,
     )
     {
