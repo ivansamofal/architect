@@ -31,9 +31,11 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     }
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $surname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -67,6 +69,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     private ?int $status = null;
 
     #[ORM\Column(unique: true)]
+    #[Assert\NotBlank]
     private ?string $email = null;
 
     #[ORM\Column]

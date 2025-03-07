@@ -20,7 +20,7 @@ services:
       - architecht_network
 
   webapp:
-    image: taygeta/php:8.3
+    image: taygeta/php:8.4
     container_name: webapp
     env_file:
       - .env.local
