@@ -32,6 +32,7 @@ services:
       - ".:/var/www/html/"
     depends_on:
       - citus-coordinator
+      - rabbitmq
     networks:
       - architecht_network
 
@@ -43,7 +44,7 @@ services:
       POSTGRES_PASSWORD: "password"
       POSTGRES_DB: "app_db"
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - citus_coordinator_data:/var/lib/postgresql/data
       - ./config/infrastructure/postgrespro/.pgpass:/root/.pgpass
@@ -58,8 +59,8 @@ services:
       POSTGRES_PASSWORD: "password"
       COORDINATOR_HOST: "citus-coordinator"
       CITUS_ROLE_NODE: "worker"
-#    volumes:
-#      - ./config/infrastructure/postgrespro/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+    volumes:
+      - ./config/infrastructure/postgrespro/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     networks:
       - architecht_network
 
@@ -71,10 +72,27 @@ services:
       POSTGRES_PASSWORD: "password"
       COORDINATOR_HOST: "citus-coordinator"
       CITUS_ROLE_NODE: "worker"
-#    volumes:
-#      - ./config/infrastructure/postgrespro/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+    volumes:
+      - ./config/infrastructure/postgrespro/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
     networks:
       - architecht_network
+
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:3.12-management"
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+      TZ: "Europe/Moscow"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - architecht_network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
 networks:
   architecht_network:
@@ -82,3 +100,4 @@ networks:
 
 volumes:
   citus_coordinator_data:
+  rabbitmq_data:

@@ -27,3 +27,8 @@ mi-generate:
 migrate:
 	php bin/console --no-interaction doctrine:migrations:migrate
 
+books:
+	php bin/console load:books
+
+queue:
+	php bin/console messenger:consume async --verbose

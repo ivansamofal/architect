@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Dto\LocationDto;
+use App\Entity\City;
 use App\Entity\Profile;
 use App\Factories\ProfileFactory;
 use App\Repository\CountryRepository;
@@ -17,7 +18,7 @@ class ProfileService
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly CountryService $countryService,
-        private readonly CityService $cityService,
+//        private readonly CityService $cityService,
     )
     {
 
@@ -48,7 +49,8 @@ class ProfileService
     public function createProfile(array $data)
     {
         $country = $this->countryService->findByCode($data['country'] ?? '');
-        $city = $this->cityService->findByName($data['city'] ?? '');
+//        $city = $this->cityService->findByName($data['city'] ?? '');//todo
+        $city = new City();//todo
         $birthDate = new \DateTimeImmutable($data['birth_date']);
         $profile = ProfileFactory::create(
             $data['name'],

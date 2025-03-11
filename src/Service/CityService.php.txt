@@ -6,7 +6,7 @@ use App\Repository\CityRepository;
 
 class CityService
 {
-    public function __construct(private readonly CityRepository $cityRepository)
+    public function __construct(private readonly CityRepositor $cityRepository)
     {
 
     }
