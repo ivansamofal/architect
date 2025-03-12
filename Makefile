@@ -27,8 +27,14 @@ mi-generate:
 migrate:
 	php bin/console --no-interaction doctrine:migrations:migrate
 
+diff:
+	php bin/console --no-interaction doctrine:migrations:diff
+
 books:
 	php bin/console load:books
 
 queue:
 	php bin/console messenger:consume async --verbose
+
+mongo:
+	docker exec -it mongodb mongosh -u root -p rootpassword --authenticationDatabase admin

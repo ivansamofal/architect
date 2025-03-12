@@ -15,14 +15,11 @@ class ProfileController extends AbstractController
     {
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
         $profiles = $this->profileService->getList();
 
-        return new JsonResponse(
-            $profiles,
-            Response::HTTP_OK
-        );
+        return $this->json($profiles);
     }
 
     /**
@@ -33,10 +30,7 @@ class ProfileController extends AbstractController
     {
         $profile = $this->profileService->find($id);
 
-        return new JsonResponse(
-            $profile ? current($profile) : (object)[],
-            Response::HTTP_OK
-        );
+        return $this->json($profile);
     }
 
     /**

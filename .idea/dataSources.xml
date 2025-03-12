@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="app_db@citus-coord 5433" uuid="c75643fc-2617-4115-b277-1abf5e27e930">
+    <data-source source="LOCAL" name="app_db@citus-coord 5432" uuid="c75643fc-2617-4115-b277-1abf5e27e930">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>

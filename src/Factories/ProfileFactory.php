@@ -27,7 +27,6 @@ class ProfileFactory
         $profile->setCountry($country);
         $profile->setCity($city);
         $profile->setBirthDate($birthDate);
-        $profile->setPassword($password);
 
         return $profile;
     }

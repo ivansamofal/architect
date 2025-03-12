@@ -8,6 +8,8 @@ use App\Repository\CountryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
 class Country implements ArrayableInterface
@@ -17,18 +19,23 @@ class Country implements ArrayableInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["country:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["country:read"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2)]
+    #[Groups(["country:read"])]
     private ?string $alpha2 = null;
 
     #[ORM\Column(length: 3)]
+    #[Groups(["country:read"])]
     private ?string $alpha3 = null;
 
-    #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'city', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: City::class, mappedBy: "country", cascade: ["remove"])]
+    #[Ignore]
     private Collection $cities;
 
     public function __construct() {
@@ -76,8 +83,36 @@ class Country implements ArrayableInterface
         return $this;
     }
 
-    public function getCities(): ArrayCollection
+    public function getCities(): Collection
     {
         return $this->cities;
+    }
+
+    public function setCities(Collection $cities): self
+    {
+        $this->cities = $cities;
+
+        return $this;
+    }
+
+    public function addCity(City $city): self
+    {
+        if (!$this->cities->contains($city)) {
+            $this->cities->add($city);
+            $city->setCountry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCity(City $city): self
+    {
+        if ($this->cities->removeElement($city)) {
+//            if ($city->getCountry() === $this) {//todo
+//                $city->setCountry(null);
+//            }
+        }
+
+        return $this;
     }
 }

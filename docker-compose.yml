@@ -20,7 +20,9 @@ services:
       - architecht_network
 
   webapp:
-    image: taygeta/php:8.4
+    build:
+      context: .
+      dockerfile: ./config/infrastructure/php/Dockerfile
     container_name: webapp
     env_file:
       - .env.local
@@ -94,6 +96,21 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: "app"
+      MONGO_INITDB_ROOT_USERNAME: "${MONGODB_USERNAME:-root}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_PASSWORD:-rootpassword}"
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - architecht_network
+
 networks:
   architecht_network:
     external: true
@@ -101,3 +118,4 @@ networks:
 volumes:
   citus_coordinator_data:
   rabbitmq_data:
+  mongodb_data:

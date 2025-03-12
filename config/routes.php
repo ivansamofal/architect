@@ -16,4 +16,5 @@ return static function (RoutingConfigurator $routes): void {
     $routes->import('routes/profile_routes.php');
     $routes->import('routes/location_routes.php');
     $routes->import('routes/book_routes.php');
+    $routes->import('routes/review_routes.php');
 };

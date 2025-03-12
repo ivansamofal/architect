@@ -3,13 +3,12 @@
 namespace App\Service;
 
 use App\Dto\LocationDto;
-use App\Entity\City;
 use App\Entity\Profile;
 use App\Factories\ProfileFactory;
-use App\Repository\CountryRepository;
 use App\Repository\ProfileRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ProfileService
 {
@@ -18,18 +17,19 @@ class ProfileService
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly CountryService $countryService,
-//        private readonly CityService $cityService,
+        private readonly CityService $cityService,
+        private readonly SerializerInterface $serializer,
     )
     {
 
     }
 
-    public function getList()
+    public function getList(): array
     {
         return $this->profileRepository->findAllActive();
     }
 
-    public function find(int $id)
+    public function find(int $id): ?Profile
     {
         return $this->profileRepository->findProfileById($id);
     }
@@ -48,10 +48,9 @@ class ProfileService
 
     public function createProfile(array $data)
     {
-        $country = $this->countryService->findByCode($data['country'] ?? '');
-//        $city = $this->cityService->findByName($data['city'] ?? '');//todo
-        $city = new City();//todo
-        $birthDate = new \DateTimeImmutable($data['birth_date']);
+        $country = $this->countryService->findByCode($data['countryCode'] ?? '');
+        $city = $this->cityService->findById($data['cityId'] ?? 0);
+        $birthDate = new \DateTimeImmutable($data['birthDate']);
         $profile = ProfileFactory::create(
             $data['name'],
             $data['surname'],

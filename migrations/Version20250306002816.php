@@ -63,6 +63,16 @@ final class Version20250306002816 extends AbstractMigration
                 (6, 'Virginia', 'Woolf'),
                 (7, 'George', 'Orwell'),
                 (8, 'Stephen', 'King');");
+
+        $this->addSql("INSERT INTO country 
+            VALUES 
+            (1, 'United States of America', 'us', 'usa'),
+            (2, 'Argentina', 'ar', 'arg'),
+            (3, 'Belgium', 'bl', 'bel'),
+            (4, 'China', 'cn', 'chn'),
+            (5, 'Colombia', 'cl', 'col'),
+            (6, 'Cyprus', 'cp', 'cyp');
+            ");
     }
 
     public function down(Schema $schema): void

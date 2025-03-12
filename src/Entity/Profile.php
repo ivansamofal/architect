@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: ProfileRepository::class)]
 class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface, UserInterface
@@ -39,9 +40,11 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     private ?string $surname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Ignore]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Ignore]
     private ?string $longitude = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
@@ -53,14 +56,16 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
 
     #[ORM\ManyToOne(targetEntity: Country::class)]
     #[ORM\JoinColumn(name: 'country_id', referencedColumnName: 'id', nullable: true, onDelete: "SET NULL")]
+    #[Ignore]
     private ?Country $country = null;
 
     #[ORM\ManyToOne(targetEntity: City::class)]
     #[ORM\JoinColumn(name: 'city_id', referencedColumnName: 'id', nullable: true, onDelete: "SET NULL")]
+    #[Ignore]
     private ?City $city = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $avatar_id = null; // Если это ID, а не связь с Avatar
+    private ?int $avatar_id = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $gender = null;
@@ -73,6 +78,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Ignore]
     private ?string $password = null;
 
 //    #[ORM\OneToMany(targetEntity: ProfileBook::class, mappedBy: 'profile', cascade: ['remove'])]
@@ -239,6 +245,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
         return $this->password;
     }
 
+    #[Ignore]
     public function getRoles(): array
     {
         return ['ROLE_ADMIN', 'ROLE_USER'];
@@ -264,5 +271,17 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function getBirthDate(): ?\DateTimeInterface
     {
         return $this->birthDate;
+    }
+
+    #[Groups(["profile:read"])]
+    public function getCountryName(): ?string
+    {
+        return $this->country ? $this->country->getName() : null;
+    }
+
+    #[Groups(["profile:read"])]
+    public function getCityName(): ?string
+    {
+        return $this->city ? $this->city->getName() : null;
     }
 }

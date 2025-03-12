@@ -17,8 +17,7 @@ class City
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[Groups(['country'])]
-    #[ORM\OneToOne(targetEntity: Country::class)]
+    #[ORM\ManyToOne(targetEntity: Country::class, inversedBy: "cities")]
     private ?Country $country = null;
 
     #[ORM\Column]
@@ -44,14 +43,14 @@ class City
         return $this;
     }
 
-    public function getCountryId(): ?int
+    public function getCountry(): ?Country
     {
-        return $this->country_id;
+        return $this->country;
     }
 
-    public function setCountryId(int $country_id): static
+    public function setCountry(Country $country): static
     {
-        $this->country_id = $country_id;
+        $this->country = $country;
 
         return $this;
     }
@@ -78,17 +77,5 @@ class City
         $this->active = $active;
 
         return $this;
-    }
-
-    public function setCountry(Country $country): static
-    {
-        $this->country = $country;
-
-        return $this;
-    }
-
-    public function getCountry(): ?Country
-    {
-        return $this->country;
     }
 }

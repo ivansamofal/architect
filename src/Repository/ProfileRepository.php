@@ -39,7 +39,7 @@ class ProfileRepository extends ServiceEntityRepository
         }
     }
 
-    public function findProfileById(int $id): array
+    public function findProfileById(int $id): ?Profile
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.profileBooks', 'pb')->addSelect('pb')
@@ -49,7 +49,7 @@ class ProfileRepository extends ServiceEntityRepository
             ->where('p.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
-            ->getArrayResult();
+            ->getOneOrNullResult();
     }
 
     public function findAllActive(): array
@@ -64,6 +64,6 @@ class ProfileRepository extends ServiceEntityRepository
             ->andWhere('p.status = :val')
             ->setParameter('val', $activeStatus)
             ->getQuery()
-            ->getArrayResult();
+            ->getResult();
     }
 }
