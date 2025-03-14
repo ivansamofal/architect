@@ -28,4 +28,9 @@ class CountryService
 
         return $country;
     }
+
+    public function saveAll(array $countries, bool $flush = false): void
+    {
+        $this->countryRepository->saveAll($countries, true);
+    }
 }

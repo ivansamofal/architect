@@ -40,4 +40,15 @@ class CityRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function saveAll(array $entities, bool $flush = false): void
+    {
+        foreach ($entities as $entity) {
+            $this->getEntityManager()->persist($entity);
+        }
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }

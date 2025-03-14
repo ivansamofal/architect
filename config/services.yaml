@@ -6,6 +6,7 @@
 parameters:
     env(MONGODB_URL): ''
     env(MONGODB_DB): ''
+    api_geo_url: '%env(API_GEO_URL)%'
 
 services:
     # default configuration for services in *this* file

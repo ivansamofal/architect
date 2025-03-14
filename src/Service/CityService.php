@@ -20,4 +20,9 @@ class CityService
     {
         return $this->cityRepository->findOneBy(['name' => $name]);
     }
+
+    public function saveAll(array $cities, bool $flush = false): void
+    {
+        $this->cityRepository->saveAll($cities, true);
+    }
 }

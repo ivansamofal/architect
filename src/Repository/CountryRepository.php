@@ -30,6 +30,17 @@ class CountryRepository extends ServiceEntityRepository
         }
     }
 
+    public function saveAll(array $entities, bool $flush = false): void
+    {
+        foreach ($entities as $entity) {
+            $this->getEntityManager()->persist($entity);
+        }
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
     public function remove(Country $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
