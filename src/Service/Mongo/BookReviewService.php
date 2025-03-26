@@ -2,17 +2,16 @@
 
 namespace App\Service\Mongo;
 
+use App\Service\NotifyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use App\Document\BookReview;
 
 class BookReviewService
 {
-    private DocumentManager $dm;
-
-    public function __construct(DocumentManager $dm)
-    {
-        $this->dm = $dm;
-    }
+    public function __construct(
+        private readonly DocumentManager $dm,
+        private readonly NotifyService $notifyService
+    ) {}
 
     public function addReview(array $data): BookReview
     {
@@ -44,7 +43,13 @@ class BookReviewService
 
     public function getReviews(): array
     {
-        return $this->dm->getRepository(BookReview::class)->findAll();
+        $reviews = $this->dm->getRepository(BookReview::class)->findAll();
+
+        if ($reviews) {
+            $this->notifyService->sendNotice('reviews have loaded 😎!');
+        }
+
+        return $reviews;
     }
 
     public function getAverageRating(int $bookId): float

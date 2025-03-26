@@ -17,6 +17,11 @@ framework:
     #fragments: true
     php_errors:
         log: true
+    #cache://todo add REDIS
+    #    pools:
+    #      cache.rate_limiter:
+    #        adapter: cache.adapter.redis
+    #        provider: '%env(REDIS_URL)%'
 
 when@test:
     framework:

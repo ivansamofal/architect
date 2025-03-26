@@ -6,6 +6,9 @@ use App\Service\Mongo\BookReviewService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class ReviewController extends AbstractController
 {
@@ -17,8 +20,18 @@ class ReviewController extends AbstractController
      *
      * #[Route('/reviews')]
      */
-    public function index(): JsonResponse
+    public function index(
+        #[Autowire(service: 'limiter.api_user_limit')]
+        RateLimiterFactory $apiUserLimit
+    ): JsonResponse
     {
+        $limiter = $apiUserLimit->create($_SERVER['REMOTE_ADDR']);
+        $limit = $limiter->consume();
+
+        if (!$limit->isAccepted()) {
+            throw new TooManyRequestsHttpException('Rate limit exceeded');
+        }
+
         $reviews = $this->bookReviewService->getReviews();
 
         return $this->json($reviews);
