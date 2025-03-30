@@ -29,7 +29,6 @@ class LocationController extends AbstractController
 
     public function save(Request $request)
     {
-//        var_dump($request->toArray());die;
         $dto = LocationDtoFactory::create($request->toArray());
         $entity = $this->profileService->saveLocation($dto);
 

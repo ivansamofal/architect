@@ -41,3 +41,6 @@ mongo:
 
 node:
 	docker exec -it node_container bash
+
+tests:
+	php vendor/bin/phpunit

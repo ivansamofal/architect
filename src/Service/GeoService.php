@@ -58,8 +58,6 @@ class GeoService
             }
         }
 
-//        var_dump($countries);
-//        var_dump($cities);die;
         $this->countryService->saveAll($countries);//todo chanks
         $this->cityService->saveAll($cities);//todo chanks
     }

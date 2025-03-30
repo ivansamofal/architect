@@ -23,7 +23,7 @@ class ProfileService
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly CountryService $countryService,
         private readonly CityService $cityService,
-        private readonly SerializerInterface $serializer,
+//        private readonly SerializerInterface $serializer,
         private readonly TagAwareCacheInterface $cache,
         private readonly LoggerInterface $logger,
     )
