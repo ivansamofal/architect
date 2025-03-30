@@ -16,7 +16,7 @@ cmp-update: ## Обновить пакеты
 	$(QUIET) docker-compose run --rm --no-deps webapp composer update ${ARGS}
 
 shell-php: ## Войти в php-контейнер
-	docker-compose run --rm --no-deps webapp /bin/sh
+	docker-compose run --rm --no-deps webapp bash
 
 entity:
 	php bin/console make:entity
@@ -38,3 +38,6 @@ queue:
 
 mongo:
 	docker exec -it mongodb mongosh -u root -p rootpassword --authenticationDatabase admin
+
+node:
+	docker exec -it node_container bash

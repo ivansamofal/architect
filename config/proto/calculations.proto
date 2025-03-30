@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package calculations;
+
+// Запрос на получение расчётов. Пока пустой, но можно добавить параметры.
+message CalculationsRequest {}
+
+// Ответ, содержащий различные метрики расчётов.
+message CalculationsResponse {
+  repeated double ema = 1;         // массив значений EMA
+  repeated double histogram = 2;   // массив значений гистограммы
+  repeated double macdLine = 3;    // массив значений MACD линии
+  repeated double rsi = 4;         // массив значений RSI
+  repeated double signalLine = 5;  // массив значений сигнальной линии
+  double vwap = 6;                 // значение VWAP
+}
+
+// Сервис расчётов, предоставляющий метод GetCalculations.
+service CalculationsService {
+  rpc GetCalculations(CalculationsRequest) returns (CalculationsResponse);
+}

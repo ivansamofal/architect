@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Exceptions\UserNotCreatedException;
 use App\Service\ProfileService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,9 +40,13 @@ class ProfileController extends AbstractController
      */
     public function create(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $profile = $this->profileService->createProfile($data);
+        try {
+            $data = json_decode($request->getContent(), true);
+            $profile = $this->profileService->createProfile($data);
 
-        return new JsonResponse(['id' => $profile->getId()], 201);
+            return new JsonResponse(['id' => $profile->getId()], 201);
+        } catch (UserNotCreatedException $e) {
+            return new JsonResponse(['id' => null, 'message' => $e->getMessage()], 500);
+        }
     }
 }

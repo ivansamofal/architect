@@ -2,15 +2,18 @@
 
 namespace App\Service\Mongo;
 
+use App\Exceptions\ReviewNotCreatedException;
 use App\Service\NotifyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use App\Document\BookReview;
+use Psr\Log\LoggerInterface;
 
 class BookReviewService
 {
     public function __construct(
         private readonly DocumentManager $dm,
-        private readonly NotifyService $notifyService
+        private readonly NotifyService $notifyService,
+        private readonly LoggerInterface $logger,
     ) {}
 
     public function addReview(array $data): BookReview
@@ -27,29 +30,31 @@ class BookReviewService
             throw new \Exception('rating is required');
         }
 
-        $review = $this->dm->getRepository(BookReview::class)->findOneBy(['bookId' => $data['bookId']]);
+        try {
+            $review = $this->dm->getRepository(BookReview::class)->findOneBy(['bookId' => $data['bookId']]);
 
-        if (!$review) {
-            $review = new BookReview();
-            $review->setBookId($data['bookId']);
+            if (!$review) {
+                $review = new BookReview();
+                $review->setBookId($data['bookId']);
+            }
+
+            $review->addReview($data['profileId'], $data['rating'], $data['comment'] ?? '');
+            $this->dm->persist($review);
+            $this->dm->flush();
+
+            $this->notifyService->sendNotice('review has created 😎!');
+
+            return $review;
+        } catch (\Throwable $e) {
+            $this->logger->error("Error during create review. Cause: {$e->getMessage()}. {$e->getFile()}:{$e->getLine()}");
+
+            throw new ReviewNotCreatedException();
         }
-
-        $review->addReview($data['profileId'], $data['rating'], $data['comment'] ?? '');
-        $this->dm->persist($review);
-        $this->dm->flush();
-
-        return $review;
     }
 
     public function getReviews(): array
     {
-        $reviews = $this->dm->getRepository(BookReview::class)->findAll();
-
-        if ($reviews) {
-            $this->notifyService->sendNotice('reviews have loaded 😎!');
-        }
-
-        return $reviews;
+        return $this->dm->getRepository(BookReview::class)->findAll();
     }
 
     public function getAverageRating(int $bookId): float

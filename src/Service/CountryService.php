@@ -20,7 +20,7 @@ class CountryService
     public function findByCode(string $code, int $length = 2)
     {
         $column = $length === 2 ? 'alpha2' : 'alpha3';
-        $country = $this->countryRepository->findOneBy([$column => $code]);
+        $country = $this->countryRepository->findOneBy([$column => strtoupper($code)]);
 
         if (!$country) {
             throw new \Exception('Country not found');

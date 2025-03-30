@@ -1,0 +1,5 @@
+#tests:
+#  "Homepage":
+#    path: /
+#  "Some API":
+#    path: /api/info

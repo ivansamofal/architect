@@ -11,11 +11,14 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/mongodb-odm-bundle": "*",
         "doctrine/orm": "^2.14",
+        "elasticsearch/elasticsearch": "^8.17",
         "enqueue/amqp-bunny": "^0.10.19",
         "enqueue/amqp-ext": "^0.10.21",
         "lexik/jwt-authentication-bundle": "*",
         "mongodb/mongodb": "*",
+        "nelmio/cors-bundle": "^2.5",
         "php-amqplib/rabbitmq-bundle": "^2.17",
+        "predis/predis": "^2.3",
         "psr/log": "^3.0",
         "symfony/amqp-messenger": "^7.0",
         "symfony/console": "^7.0",
@@ -35,6 +38,7 @@
         "symfony/telegram-notifier": "^7.0",
         "symfony/twig-bundle": "^7.0",
         "symfony/validator": "^7.0",
+        "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "^7.0"
     },
     "config": {

@@ -5,7 +5,7 @@ services:
     container_name: server
     image: nginx:alpine
     environment:
-      TZ: "Europe/Moscow"
+      TZ: "Europe/Berlin"
     volumes:
       - ".:/var/www/html/"
       - "./config/infrastructure/nginx/conf.d/:/etc/nginx/conf.d/"
@@ -27,16 +27,40 @@ services:
     env_file:
       - .env.local
     environment:
-      TZ: "Europe/Moscow"
+      TZ: "Europe/Berlin"
       DB_HOST: "citus-coordinator"  # Используем Citus
       DB_PORT: "5432"
+      BLACKFIRE_SERVER_ID: dd891ebf-1d38-4c3f-9ca2-4a0d965ffbf1
+      BLACKFIRE_SERVER_TOKEN: fbcef191cbb8212e67b738233604fabc4a1770c3577ba19b540165fa7932ee5d
     volumes:
       - ".:/var/www/html/"
+      - "./config/infrastructure/php/blackfire.ini:/usr/local/etc/php/conf.d/blackfire.ini"
+      - "./config/infrastructure/php/php.ini:/usr/local/etc/php/php.ini"
     depends_on:
       - citus-coordinator
       - rabbitmq
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - architecht_network
+
+#  dbase:
+#    container_name: dbase
+#    image: postgres:15
+#    restart: always
+#    env_file:
+#      - .env.local
+#    environment:
+#      POSTGRES_USER: "${DB_USER:-postgres}"
+#      POSTGRES_PASSWORD: "${DB_PASSWORD:-password}"
+#      POSTGRES_DB: "${DB_NAME:-app_db}"
+#      TZ: "Europe/Berlin"
+#    volumes:
+#      - dbase_data:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - architecht_network
 
   citus-coordinator:
     image: citusdata/citus:12.1.3
@@ -87,7 +111,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
-      TZ: "Europe/Moscow"
+      TZ: "Europe/Berlin"
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -111,6 +135,85 @@ services:
     networks:
       - architecht_network
 
+  node_container:
+    container_name: node_container
+    build: ./frontend
+    working_dir: /usr/src/app
+    environment:
+      TZ: "Europe/Berlin"
+    volumes:
+      - ./frontend:/usr/src/app
+     # - node_modules:/usr/src/app/node_modules
+    command: sh -c "npm run dev && node server.js"
+    depends_on:
+      - webapp
+    ports:
+      - "3005:3000"
+    networks:
+      - architecht_network
+
+  blackfire:
+    image: blackfire/blackfire
+    ports:
+      - 8707
+    environment:
+      BLACKFIRE_SERVER_ID: dd891ebf-1d38-4c3f-9ca2-4a0d965ffbf1
+      BLACKFIRE_SERVER_TOKEN: fbcef191cbb8212e67b738233604fabc4a1770c3577ba19b540165fa7932ee5d
+    networks:
+      - architecht_network
+
+  jmeter:
+    image: justb4/jmeter:latest
+    container_name: jmeter
+    volumes:
+      - ./tests/jmeter:/jmeter/testplans     # сюда клади .jmx-файлы
+      - ./jmeter:/jmeter      # сюда будут лог-файлы
+    working_dir: /jmeter
+    entrypoint: [ "jmeter" ]
+    networks:
+      - architecht_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - architecht_network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - architecht_network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - architecht_network
+
 networks:
   architecht_network:
     external: true
@@ -119,3 +222,6 @@ volumes:
   citus_coordinator_data:
   rabbitmq_data:
   mongodb_data:
+  node_modules:
+  #dbase_data:
+  esdata:

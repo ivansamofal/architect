@@ -17,11 +17,18 @@ framework:
     #fragments: true
     php_errors:
         log: true
-    #cache://todo add REDIS
-    #    pools:
-    #      cache.rate_limiter:
-    #        adapter: cache.adapter.redis
-    #        provider: '%env(REDIS_URL)%'
+
+    cache:
+        pools:
+          cache.rate_limiter:
+            adapter: cache.adapter.redis
+            provider: '%env(REDIS_URL)%'
+          cache.profiles:
+            adapter: cache.adapter.redis_tag_aware
+        #app: cache.adapter.redis
+        default_redis_provider: redis://redis
+
+
 
 when@test:
     framework:
