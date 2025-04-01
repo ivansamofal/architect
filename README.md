@@ -1,122 +1,126 @@
-# Проект Архитектуры с Docker Compose
+# Architecture Project with Docker Compose
 
-Этот проект использует Docker Compose для разворачивания много-компонентного окружения, включающего веб-сервер, PHP-приложение, распределённую базу данных, очередь сообщений, кэш, NoSQL, Elasticsearch с Kibana и другие сервисы. Ниже описаны основные компоненты и их назначение.
+This project uses Docker Compose to deploy a multi-component environment, including a web server, a PHP application, a distributed database, a message queue, caching, NoSQL, Elasticsearch with Kibana, and other services. Below are the main components and their purposes.
 
-## Стек и основные сервисы
+## Stack and Main Services
 
 - **server (nginx)**
-    - Используется официальный образ `nginx:alpine`.
-    - Выполняет роль обратного прокси-сервера.
-    - Монтирует конфигурационные файлы, SSL-сертификаты и основной конфиг nginx из локальных директорий.
-    - Прокидывает порты 80 (HTTP) и 443 (HTTPS).
+    - Uses the official `nginx:alpine` image.
+    - Acts as a reverse proxy.
+    - Mounts configuration files, SSL certificates, and the main nginx configuration from local directories.
+    - Exposes ports 80 (HTTP) and 443 (HTTPS).
 
-- **webapp (PHP-приложение)**
-    - Собирается на основе Dockerfile, расположенного по пути `./config/infrastructure/php/Dockerfile`.
-    - Использует переменные окружения, в том числе настройки для подключения к БД (используется Citus).
-    - Монтирует локальный код в контейнер, а также конфигурационные файлы PHP и Blackfire.
-    - Зависит от сервисов `citus-coordinator` и `rabbitmq`.
+- **webapp (PHP application)**
+    - Built using a Dockerfile located at `./config/infrastructure/php/Dockerfile`.
+    - Uses environment variables, including database connection settings (using Citus).
+    - Mounts local code into the container as well as PHP and Blackfire configuration files.
+    - Depends on the `citus-coordinator` and `rabbitmq` services.
 
-- **citus-coordinator и citus-worker (PostgreSQL + Citus)**
-    - **citus-coordinator**: основной координатор для распределённой БД.
-    - **citus-worker-1 и citus-worker-2**: воркеры для распределённого хранения и обработки данных.
-    - Используются образы `citusdata/citus:12.1.3`.
-    - Позволяют горизонтально масштабировать PostgreSQL с помощью расширения Citus.
+- **citus-coordinator and citus-worker (PostgreSQL + Citus)**
+    - **citus-coordinator**: The primary coordinator for the distributed database.
+    - **citus-worker-1 and citus-worker-2**: Workers for distributed data storage and processing.
+    - Uses the `citusdata/citus:12.1.3` images.
+    - Enables horizontal scaling of PostgreSQL with the Citus extension.
 
 - **rabbitmq**
-    - Образ: `rabbitmq:3.12-management`.
-    - Управляет очередями сообщений для асинхронной обработки задач.
-    - Прокидывает порты 5672 (AMQP) и 15672 (интерфейс управления).
+    - Image: `rabbitmq:3.12-management`.
+    - Manages message queues for asynchronous task processing.
+    - Exposes ports 5672 (AMQP) and 15672 (management interface).
 
 - **mongodb**
-    - Образ: `mongo:6.0`.
-    - NoSQL база данных для хранения документов.
-    - Настроен с корневым пользователем и паролем, порт 27017 открыт для доступа.
+    - Image: `mongo:6.0`.
+    - A NoSQL database for storing documents.
+    - Configured with a root user and password; port 27017 is open for access.
 
 - **node_container**
-    - Собирается на основе Dockerfile в директории `./frontend`.
-    - Выполняет сборку и запуск frontend-приложения (npm run dev и node server.js).
-    - Монтирует исходный код фронтенда для разработки.
-    - Прокидывает порт 3005, связанный с приложением внутри контейнера.
+    - Built using a Dockerfile in the `./frontend` directory.
+    - Builds and runs the frontend application (runs `npm run dev` and `node server.js`).
+    - Mounts the frontend source code for development.
+    - Exposes port 3005, which is mapped to the application running inside the container.
 
 - **blackfire**
-    - Образ: `blackfire/blackfire`.
-    - Инструмент для профилирования и мониторинга производительности PHP-приложения.
-    - Использует переменные окружения для аутентификации.
+    - Image: `blackfire/blackfire`.
+    - A tool for profiling and monitoring the performance of the PHP application.
+    - Uses environment variables for authentication.
 
 - **jmeter**
-    - Образ: `justb4/jmeter:latest`.
-    - Используется для нагрузочного тестирования.
-    - Монтируются директории с тестовыми планами (`.jmx` файлы) и логами тестирования.
+    - Image: `justb4/jmeter:latest`.
+    - Used for load testing.
+    - Mounts directories containing test plans (`.jmx` files) and logs for testing.
 
 - **redis**
-    - Образ: `redis:7-alpine`.
-    - Служит для кэширования и быстрого доступа к данным.
-    - Прокидывается порт 6379.
+    - Image: `redis:7-alpine`.
+    - Provides caching and fast data access.
+    - Exposes port 6379.
 
 - **elasticsearch**
-    - Образ: `docker.elastic.co/elasticsearch/elasticsearch:8.11.1`.
-    - Используется как поисковый движок и бекенд для логирования.
-    - Запущен в однокластерном режиме (`discovery.type=single-node`).
-    - Память ограничена с помощью ES_JAVA_OPTS.
+    - Image: `docker.elastic.co/elasticsearch/elasticsearch:8.11.1`.
+    - Used as a search engine and backend for logging.
+    - Runs in single-node mode (`discovery.type=single-node`).
+    - Memory is limited using `ES_JAVA_OPTS`.
 
 - **kibana**
-    - Образ: `docker.elastic.co/kibana/kibana:8.11.1`.
-    - Веб-интерфейс для визуализации и анализа данных Elasticsearch.
-    - Подключается к Elasticsearch через переменную окружения `ELASTICSEARCH_HOSTS`.
+    - Image: `docker.elastic.co/kibana/kibana:8.11.1`.
+    - A web interface for visualizing and analyzing Elasticsearch data.
+    - Connects to Elasticsearch via the `ELASTICSEARCH_HOSTS` environment variable.
 
-## Сети и тома
+## Networks and Volumes
 
-- **Сеть `architecht_network`**
-    - Все сервисы подключены к общей внешней сети `architecht_network` для взаимодействия.
+- **Network `architecht_network`**
+    - All services are connected to the common external network `architecht_network` for interaction.
 
-- **Тома для персистентных данных**
-    - `citus_coordinator_data` — данные PostgreSQL (Citus Coordinator).
-    - `rabbitmq_data` — данные RabbitMQ.
-    - `mongodb_data` — данные MongoDB.
-    - `esdata` — данные Elasticsearch.
-    - Другие тома используются для node_modules (если необходимо).
+- **Persistent Data Volumes**
+    - `citus_coordinator_data` — PostgreSQL data (Citus Coordinator).
+    - `rabbitmq_data` — RabbitMQ data.
+    - `mongodb_data` — MongoDB data.
+    - `esdata` — Elasticsearch data.
+    - Other volumes are used for node_modules (if necessary).
 
-## Как запустить
+## How to Run
 
-1. **Убедитесь, что Docker и Docker Compose установлены** на вашей машине.
+1. **Ensure that Docker and Docker Compose are installed** on your machine.
 
-2. **Настройте переменные окружения** в файле `.env.local` (если они требуются).
+2. **Configure environment variables** in the `.env.local` file (if required).
 
-3. **Запустите Docker Compose:**
+3. **Start Docker Compose:**
 
    ```bash
    docker-compose up -d
-Проверьте статус контейнеров:
+   ```
 
-bash
-Копировать
+
+3. **Check the status of the containers:**
+```bash
 docker-compose ps
-Доступ к сервисам:
+```
 
-Веб-приложение будет доступно через nginx по портам 80 и 443.
+3. **Access the services:**
 
-Kibana доступна по адресу http://localhost:5601.
 
-RabbitMQ интерфейс управления доступен по адресу http://localhost:15672 (логин/пароль: guest/guest).
+- The web application will be available via nginx on ports 80 and 443.
 
-Что добавлено
-NGINX как обратный прокси для распределения входящих запросов между сервисами.
+- Kibana is available at http://localhost:5601.
 
-PHP-приложение с поддержкой Blackfire для профилирования.
+- The RabbitMQ management interface is available at http://localhost:15672 (login/password: guest/guest).
 
-Распределённая база данных на основе Citus для горизонтального масштабирования PostgreSQL.
+## What’s Included
+- NGINX as a reverse proxy to distribute incoming requests among services.
 
-RabbitMQ для асинхронной обработки сообщений.
+- A PHP application with Blackfire support for profiling.
 
-MongoDB для NoSQL-хранения данных.
+- A distributed database based on Citus for horizontal scaling of PostgreSQL.
 
-Node.js контейнер для фронтенд разработки и сборки.
+- RabbitMQ for asynchronous message processing.
 
-JMeter для нагрузочного тестирования.
+- MongoDB for NoSQL data storage.
 
-Redis для кэширования.
+- A Node.js container for frontend development and build processes.
 
-Elasticsearch и Kibana для логирования и анализа данных.
+- JMeter for load testing.
 
-Заключение
-Этот стек позволяет разрабатывать, тестировать и масштабировать веб-приложение с использованием современных инструментов и технологий. Каждая часть окружения изолирована в контейнере, что упрощает управление зависимостями и обеспечивает гибкость при развертывании.
+- Redis for caching.
+
+- Elasticsearch and Kibana for logging and data analysis.
+
+Conclusion
+This stack enables you to develop, test, and scale a web application using modern tools and technologies. Each part of the environment is isolated in a container, simplifying dependency management and ensuring flexibility in deployment.

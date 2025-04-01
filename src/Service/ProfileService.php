@@ -4,18 +4,19 @@ namespace App\Service;
 
 use App\Dto\LocationDto;
 use App\Entity\Profile;
+use App\Event\ProfileEvent;
 use App\Exceptions\UserNotCreatedException;
 use App\Factories\ProfileFactory;
 use App\Repository\ProfileRepository;
+use App\Service\Interfaces\ProfileServiceInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Cache\CacheItemPoolInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
-class ProfileService
+class ProfileService implements ProfileServiceInterface
 {
     public function __construct(
         private readonly ProfileRepository $profileRepository,
@@ -23,9 +24,9 @@ class ProfileService
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly CountryService $countryService,
         private readonly CityService $cityService,
-//        private readonly SerializerInterface $serializer,
         private readonly TagAwareCacheInterface $cache,
         private readonly LoggerInterface $logger,
+        private readonly EventDispatcherInterface $eventDispatcher,
     )
     {
 
@@ -58,9 +59,19 @@ class ProfileService
         return $profile;
     }
 
-    public function createProfile(array $data)
+    public function createProfile(array $data): Profile
     {
         try {
+            if (empty($data['email'])) {
+                throw new \Exception('email is required');
+            }
+
+            $profile = $this->profileRepository->findBy(['email' => $data['email']]);
+
+            if ($profile) {
+                throw new \Exception('profile already exists with this email');
+            }
+
             $country = $this->countryService->findByCode($data['countryCode'] ?? '');
             $city = $this->cityService->findById($data['cityId'] ?? 0);
             $birthDate = new \DateTimeImmutable($data['birthDate']);
@@ -80,6 +91,9 @@ class ProfileService
             $this->entityManager->flush();
             $this->cache->invalidateTags(['profiles']);
 
+            $event = new ProfileEvent($profile->getId(), $profile->getEmail());
+            $this->eventDispatcher->dispatch($event, ProfileEvent::NAME);
+
             return $profile;
         } catch (\Throwable $e) {
             $this->logger->error('User creation failed', [
@@ -88,7 +102,7 @@ class ProfileService
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            throw new UserNotCreatedException();
+            throw new UserNotCreatedException($e->getMessage());
         }
     }
 }

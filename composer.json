@@ -17,6 +17,8 @@
         "lexik/jwt-authentication-bundle": "*",
         "mongodb/mongodb": "*",
         "nelmio/cors-bundle": "^2.5",
+        "open-telemetry/opentelemetry": "^1.0",
+        "opentracing/opentracing": "^1.0",
         "php-amqplib/rabbitmq-bundle": "^2.17",
         "predis/predis": "^2.3",
         "psr/log": "^3.0",
@@ -25,7 +27,7 @@
         "symfony/dotenv": "^7.0",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "^7.0",
-        "symfony/http-client": "^7.0",
+        "symfony/http-client": "^6.0",
         "symfony/lock": "^7.0",
         "symfony/messenger": "^7.0",
         "symfony/monolog-bundle": "^3.10",
@@ -45,7 +47,8 @@
         "allow-plugins": {
             "php-http/discovery": true,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "tbachert/spi": true
         },
         "sort-packages": true
     },
@@ -95,5 +98,11 @@
         "symfony/css-selector": "^7.0",
         "symfony/maker-bundle": "^1.48",
         "symfony/phpunit-bridge": "^7.2"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/open-telemetry/opentelemetry-exporter-jaeger"
+        }
+    ]
 }

@@ -7,6 +7,7 @@ parameters:
     env(MONGODB_URL): ''
     env(MONGODB_DB): ''
     api_geo_url: '%env(API_GEO_URL)%'
+    jaeger_collector_url: '%env(JAEGER_COLLECTOR_URL)%'
 
 services:
     # default configuration for services in *this* file
@@ -34,3 +35,39 @@ services:
 
     Elastic\Elasticsearch\Client:
       factory: ['App\Factories\ElasticsearchClientFactory', 'create']
+
+    App\Service\Tracing\JaegerTracerFactory:
+      public: false
+
+    # Explicitly declare the tracer service with a class type even though it's built by a factory.
+    jaeger.tracer:
+      class: OpenTelemetry\SDK\Trace\Tracer  # Use the concrete class if available; otherwise, use the interface for autowiring.
+      factory: ['App\Factories\JaegerTracerFactory', 'createTracer']
+      public: true
+#      arguments:
+#        $endpoint: '%jaeger_collector_url%'
+      # Example of additional method calls on the tracer at compile time:
+      #calls:
+      #  - [setSomeOption, ['someValue']]
+
+    App\Service\ProfileService:
+      arguments:
+          $cache: '@Symfony\Contracts\Cache\TagAwareCacheInterface'
+          $profileRepository: '@App\Repository\ProfileRepository'
+      public: false
+
+        # Decorated service registered as the alias for ProfileServiceInterface
+    App\Service\ProfileServiceInterface:
+        alias: App\Decorator\TraceableProfileService
+
+    # The TraceableProfileService depends on the original service. We can use the decorator pattern.
+    App\Decorator\TraceableProfileService:
+        arguments:
+            $decorated: '@App\Service\ProfileService'
+            $logger: '@logger'
+
+    App\EventSubscriber\ProfileEventSubscriber:
+      arguments:
+        $notificationService: '@App\Service\NotifyService'
+      tags:
+        - { name: 'kernel.event_subscriber' }

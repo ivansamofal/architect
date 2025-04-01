@@ -225,6 +225,11 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
         return $this;
     }
 
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
     public function getProfileBooks(): Collection
     {
         return $this->profileBooks;

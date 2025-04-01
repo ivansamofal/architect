@@ -2,32 +2,42 @@
 
 namespace App\Controller\Api;
 
+use App\Decorator\TraceableProfileService;
 use App\Exceptions\UserNotCreatedException;
 use App\Service\ProfileService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class ProfileController extends AbstractController
 {
-    public function __construct(private readonly ProfileService $profileService)
+    public function __construct(
+//        private readonly ProfileService $profileService,
+        private readonly TraceableProfileService $profileService,
+        private readonly LoggerInterface $logger,
+    )
     {
     }
 
     public function index(): JsonResponse
     {
-        $profiles = $this->profileService->getList();
+        try {
+            $profiles = $this->profileService->getList();
+            return $this->json($profiles);
+        } catch (\Throwable $e) {
+            $message = "Error in profiles list endpoint. Cause: {$e->getMessage()}";
+            $this->logger->error($message);
 
-        return $this->json($profiles);
+            return $this->json(['message' => $message]);
+        }
     }
 
     /**
      *
      * #[Route('/profiles/{id}')]
      */
-    public function get($id): JsonResponse
+    public function get(int $id): JsonResponse
     {
         $profile = $this->profileService->find($id);
 
@@ -46,7 +56,7 @@ class ProfileController extends AbstractController
 
             return new JsonResponse(['id' => $profile->getId()], 201);
         } catch (UserNotCreatedException $e) {
-            return new JsonResponse(['id' => null, 'message' => $e->getMessage()], 500);
+            return new JsonResponse(['message' => $e->getMessage()], 500);
         }
     }
 }
