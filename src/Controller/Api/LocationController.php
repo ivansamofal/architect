@@ -17,8 +17,6 @@ class LocationController extends AbstractController
 
     public function index()
     {
-
-        echo 444;die;
         $profiles = $this->profileService->getList();
 
         return new JsonResponse(

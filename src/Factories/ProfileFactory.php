@@ -2,6 +2,7 @@
 
 namespace App\Factories;
 
+use App\Dto\ProfileDto;
 use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\City;
@@ -11,22 +12,19 @@ use App\Entity\Profile;
 class ProfileFactory
 {
     public static function create(
-        string $name,
-        string $surname,
-        string $email,
+        ProfileDto $profileDto,
         Country $country,
-        City $city,
-        \DateTimeInterface $birthDate
+        City $city
     ): Profile
     {
         $profile = new Profile();
-        $profile->setName($name);
-        $profile->setSurname($surname);
+        $profile->setName($profileDto->name);
+        $profile->setSurname($profileDto->surname);
         $profile->setStatus(1);
-        $profile->setEmail($email);
+        $profile->setEmail($profileDto->email);
         $profile->setCountry($country);
         $profile->setCity($city);
-        $profile->setBirthDate($birthDate);
+        $profile->setBirthDate($profileDto->birthDate);
 
         return $profile;
     }

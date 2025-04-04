@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Decorator\TraceableProfileService;
+use App\Dto\ProfileDto;
 use App\Exceptions\UserNotCreatedException;
 use App\Service\ProfileService;
 use Psr\Log\LoggerInterface;
@@ -48,11 +49,10 @@ class ProfileController extends AbstractController
      *
      * #[Route('/profiles')]
      */
-    public function create(Request $request): JsonResponse
+    public function create(ProfileDto $profileDto): JsonResponse
     {
         try {
-            $data = json_decode($request->getContent(), true);
-            $profile = $this->profileService->createProfile($data);
+            $profile = $this->profileService->createProfile($profileDto);
 
             return new JsonResponse(['id' => $profile->getId()], 201);
         } catch (UserNotCreatedException $e) {

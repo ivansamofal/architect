@@ -21,6 +21,10 @@ RUN docker-php-ext-install pdo_pgsql
 # Установка и активация расширений через PECL
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 
+RUN apt-get update && apt-get install -y librabbitmq-dev && \
+    pecl install amqp && \
+    docker-php-ext-enable amqp
+
 # Устанавливаем Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -60,6 +64,8 @@ RUN curl -s https://packages.blackfire.io/gpg.key | apt-key add - && \
     echo "deb http://packages.blackfire.io/debian any main" > /etc/apt/sources.list.d/blackfire.list && \
     apt-get update && \
     apt-get install -y blackfire-agent
+
+RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 # Очистка после установки
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

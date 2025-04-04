@@ -2,17 +2,17 @@
 
 namespace App\Service;
 
+use App\Entity\Country;
 use App\Repository\CountryRepository;
-use App\Repository\ProfileRepository;
 
-class CountryService
+readonly class CountryService
 {
     public function __construct(private CountryRepository $countryRepository)
     {
 
     }
 
-    public function findById(int $id)
+    public function findById(int $id): ?Country
     {
         return $this->countryRepository->find($id);
     }

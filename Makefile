@@ -42,5 +42,5 @@ mongo:
 node:
 	docker exec -it node_container bash
 
-tests:
+tests-run:
 	php vendor/bin/phpunit

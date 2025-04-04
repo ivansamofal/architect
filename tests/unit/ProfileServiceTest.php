@@ -7,6 +7,7 @@ use App\Repository\ProfileRepository;
 use App\Service\ProfileService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -18,30 +19,18 @@ class ProfileServiceTest extends TestCase
 {
     public function testGetListReturnsArrayOfProfileObjects()
     {
-        // Создаем тестовый объект Profile
         $profile = new Profile();
-        // При необходимости установите значения полей через сеттеры или напрямую
 
-        // Мокаем репозиторий, чтобы он возвращал массив объектов Profile
         $profileRepositoryMock = $this->createMock(ProfileRepository::class);
         $profileRepositoryMock->expects($this->once())
             ->method('findAllActive')
             ->willReturn([$profile]);
-//        var_dump(get_class($profileRepositoryMock));die;
 
-        // Мокаем EntityManagerInterface (не используется в данном тесте, поэтому можно оставить пустым)
-        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-
-        // Мокаем UserPasswordHasherInterface
         $passwordHasherMock = $this->createMock(UserPasswordHasherInterface::class);
-
-        // Мокаем CountryService
         $countryServiceMock = $this->createMock(CountryService::class);
-
-        // Мокаем CityService
         $cityServiceMock = $this->createMock(CityService::class);
+        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
 
-        // Мокаем кэш (TagAwareCacheInterface)
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
         $cacheMock->expects($this->once())
             ->method('get')
@@ -53,36 +42,33 @@ class ProfileServiceTest extends TestCase
             )
             ->willReturnCallback(function ($key, $callback) {
                 $itemMock = $this->createMock(ItemInterface::class);
-                // Симулируем установку ttl и тегов, если это необходимо
                 $itemMock->expects($this->any())->method('expiresAfter')->with(3600);
                 $itemMock->expects($this->any())->method('tag')->with(['profiles']);
                 return $callback($itemMock);
             });
 
-        // Мокаем LoggerInterface
         $loggerMock = $this->createMock(LoggerInterface::class);
 
-        // Создаем экземпляр ProfileService с замоканными зависимостями.
         $profileService = new ProfileService(
             $profileRepositoryMock,
-            $entityManagerMock,
             $passwordHasherMock,
             $countryServiceMock,
             $cityServiceMock,
             $cacheMock,
-            $loggerMock
+            $loggerMock,
+            $eventDispatcherMock
         );
 
         $result = $profileService->getList();
 
-        $this->assertIsArray($result, 'Метод getList должен возвращать массив.');
-        $this->assertNotEmpty($result, 'Метод getList не должен возвращать пустой массив.');
+        $this->assertIsArray($result, 'Method getList must return array.');
+        $this->assertNotEmpty($result, 'Method getList shouldn\'t return an empty array.');
 
         foreach ($result as $item) {
             $this->assertInstanceOf(
                 Profile::class,
                 $item,
-                'Каждый элемент результата должен быть экземпляром App\Entity\Profile.'
+                'Every element must be instance of App\Entity\Profile.'
             );
         }
     }

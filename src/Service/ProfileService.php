@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Dto\LocationDto;
+use App\Dto\ProfileDto;
 use App\Entity\Profile;
 use App\Event\ProfileEvent;
 use App\Exceptions\UserNotCreatedException;
@@ -20,7 +21,6 @@ class ProfileService implements ProfileServiceInterface
 {
     public function __construct(
         private readonly ProfileRepository $profileRepository,
-        private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly CountryService $countryService,
         private readonly CityService $cityService,
@@ -59,40 +59,14 @@ class ProfileService implements ProfileServiceInterface
         return $profile;
     }
 
-    public function createProfile(array $data): Profile
+    public function createProfile(ProfileDto $profileDto): Profile
     {
         try {
-            if (empty($data['email'])) {
-                throw new \Exception('email is required');
-            }
+            $profile = $this->prepareEntity($profileDto);
+            $this->profileRepository->save($profile, true);
+            $this->cache->invalidateTags(['profiles']);//todo put into save?
 
-            $profile = $this->profileRepository->findBy(['email' => $data['email']]);
-
-            if ($profile) {
-                throw new \Exception('profile already exists with this email');
-            }
-
-            $country = $this->countryService->findByCode($data['countryCode'] ?? '');
-            $city = $this->cityService->findById($data['cityId'] ?? 0);
-            $birthDate = new \DateTimeImmutable($data['birthDate']);
-            $profile = ProfileFactory::create(
-                $data['name'],
-                $data['surname'],
-                $data['email'],
-                $country,
-                $city,
-                $birthDate
-            );
-
-            $hashedPassword = $this->passwordHasher->hashPassword($profile, $data['password']);
-            $profile->setPassword($hashedPassword);
-
-            $this->entityManager->persist($profile);
-            $this->entityManager->flush();
-            $this->cache->invalidateTags(['profiles']);
-
-            $event = new ProfileEvent($profile->getId(), $profile->getEmail());
-            $this->eventDispatcher->dispatch($event, ProfileEvent::NAME);
+            $this->sendEvent($profile);
 
             return $profile;
         } catch (\Throwable $e) {
@@ -104,5 +78,32 @@ class ProfileService implements ProfileServiceInterface
             ]);
             throw new UserNotCreatedException($e->getMessage());
         }
+    }
+
+    public function findOneBy(array $criteria, ?array $orderBy = null): ?Profile
+    {
+        return $this->profileRepository->findOneBy($criteria, $orderBy);
+    }
+
+    private function prepareEntity(ProfileDto $profileDto): Profile
+    {
+        $country = $this->countryService->findByCode($profileDto->countryCode);
+        $city = $this->cityService->findById($profileDto->cityId);
+        $profile = ProfileFactory::create(
+            $profileDto,
+            $country,
+            $city
+        );
+
+        $hashedPassword = $this->passwordHasher->hashPassword($profile, $profileDto->password);
+        $profile->setPassword($hashedPassword);
+
+        return $profile;
+    }
+
+    private function sendEvent(Profile $profile): void
+    {
+        $event = new ProfileEvent($profile->getId(), $profile->getEmail());
+        $this->eventDispatcher->dispatch($event, ProfileEvent::NAME);
     }
 }

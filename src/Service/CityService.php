@@ -13,7 +13,13 @@ class CityService
 
     public function findById(int $id)
     {
-        return $this->cityRepository->find($id);
+        $city = $this->cityRepository->find($id);
+
+        if ($city === null) {
+            throw new \Exception('City not found');
+        }
+
+        return $city;
     }
 
     public function findByName(string $name)

@@ -2,6 +2,7 @@
 namespace App\Decorator;
 
 use App\Dto\LocationDto;
+use App\Dto\ProfileDto;
 use App\Entity\Profile;
 use App\Service\Interfaces\ProfileServiceInterface;
 use App\Factories\JaegerTracerFactory;
@@ -19,7 +20,6 @@ class TraceableProfileService implements ProfileServiceInterface
     {
         $this->decorated = $decorated;
         $this->logger = $logger;
-        // Initialize the tracer provider and tracer only once.
         $this->tracerProvider = JaegerTracerFactory::createTracerProvider($this->logger);
         $this->jaegerName = $_ENV['JAEGER_NAME'] ?? 'my-symfony-app';
         $this->tracer = $this->tracerProvider->getTracer($this->jaegerName);
@@ -61,16 +61,15 @@ class TraceableProfileService implements ProfileServiceInterface
 
     public function saveLocation(LocationDto $dto)
     {
-        // If you don't need tracing here, just delegate.
         $this->decorated->saveLocation($dto);
     }
 
-    public function createProfile(array $data): Profile
+    public function createProfile(ProfileDto $profileDto): Profile
     {
         return $this->withTrace(
             'handle_createProfile',
             '/api/profile/create',
-            fn() => $this->decorated->createProfile($data)
+            fn() => $this->decorated->createProfile($profileDto)
         );
     }
 }
