@@ -1,12 +1,11 @@
 <?php
+
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -16,7 +15,9 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 
 class AppAuthenticator extends AbstractLoginFormAuthenticator implements AuthenticationEntryPointInterface
 {
-    public function __construct(private UrlGeneratorInterface $urlGenerator) {}
+    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    {
+    }
 
     public function authenticate(Request $request): Passport
     {

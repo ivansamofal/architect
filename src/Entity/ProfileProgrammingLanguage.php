@@ -14,11 +14,11 @@ class ProfileProgrammingLanguage
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Profile::class)]
-    #[ORM\JoinColumn(name: "profile_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: 'profile_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Profile $profile = null;
 
     #[ORM\ManyToOne(targetEntity: ProgrammingLanguage::class)]
-    #[ORM\JoinColumn(name: "programming_language_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: 'programming_language_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?ProgrammingLanguage $programmingLanguage = null;
 
     public function getId(): ?int

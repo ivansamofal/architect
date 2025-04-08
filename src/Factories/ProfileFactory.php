@@ -3,8 +3,6 @@
 namespace App\Factories;
 
 use App\Dto\ProfileDto;
-use App\Entity\Author;
-use App\Entity\Book;
 use App\Entity\City;
 use App\Entity\Country;
 use App\Entity\Profile;
@@ -14,9 +12,8 @@ class ProfileFactory
     public static function create(
         ProfileDto $profileDto,
         Country $country,
-        City $city
-    ): Profile
-    {
+        City $city,
+    ): Profile {
         $profile = new Profile();
         $profile->setName($profileDto->name);
         $profile->setSurname($profileDto->surname);

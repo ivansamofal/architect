@@ -2,11 +2,10 @@
 
 namespace App\EventListener;
 
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 #[AsEventListener]
 class JsonExceptionListener
@@ -15,7 +14,7 @@ class JsonExceptionListener
     {
         $request = $event->getRequest();
 
-        if ($request->getPreferredFormat() !== 'json') {
+        if ('json' !== $request->getPreferredFormat()) {
             return;
         }
 
@@ -29,7 +28,7 @@ class JsonExceptionListener
         ];
 
         $decoded = json_decode($exception->getMessage(), true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+        if (JSON_ERROR_NONE === json_last_error() && is_array($decoded)) {
             $data = $decoded;
             $statusCode = 400;
         }

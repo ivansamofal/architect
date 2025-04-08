@@ -1,0 +1,51 @@
+<?php
+
+namespace App\EventListener;
+
+use App\Factories\JaegerTracerFactory;
+use OpenTelemetry\SDK\Trace\TracerProvider;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+#[AsEventListener(event: KernelEvents::REQUEST)]
+class TracingListener
+{
+    private $tracerProvider;
+    private $tracer;
+    private $span;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->tracerProvider = JaegerTracerFactory::createTracerProvider($logger);
+        $this->tracer = $this->tracerProvider->getTracer($_ENV['JAEGER_NAME'] ?? 'app');
+    }
+
+    public function __invoke(RequestEvent $event)
+    {
+        if ($_ENV['ENABLE_JAEGER'] !== '1') {
+            return;
+        }
+
+        echo 3;
+        $request = $event->getRequest();
+        $path = $request->getPathInfo();
+        $this->span = $this->tracer->spanBuilder($path)->startSpan();
+        $this->span->setAttribute('method', $request->getMethod());
+        $this->span->setAttribute('path', $path);
+        echo 6;
+    }
+
+    #[AsEventListener(event: KernelEvents::TERMINATE)]
+    public function onTerminate(TerminateEvent $event)
+    {
+        if ($_ENV['ENABLE_JAEGER'] !== '1') {
+            return;
+        }
+
+        $this->span?->end();
+        $this->tracerProvider->forceFlush();
+    }
+}

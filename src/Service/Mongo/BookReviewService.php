@@ -2,10 +2,10 @@
 
 namespace App\Service\Mongo;
 
+use App\Document\BookReview;
 use App\Exceptions\ReviewNotCreatedException;
 use App\Service\NotifyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use App\Document\BookReview;
 use Psr\Log\LoggerInterface;
 
 class BookReviewService
@@ -14,7 +14,8 @@ class BookReviewService
         private readonly DocumentManager $dm,
         private readonly NotifyService $notifyService,
         private readonly LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     public function addReview(array $data): BookReview
     {
@@ -66,6 +67,7 @@ class BookReviewService
         }
 
         $total = array_sum(array_column($review->getReviews(), 'rating'));
+
         return round($total / count($review->getReviews()), 1);
     }
 }

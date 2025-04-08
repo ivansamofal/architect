@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service\Interfaces;
 
 use App\Dto\LocationDto;

@@ -2,8 +2,8 @@
 
 namespace App\Dto;
 
-use Symfony\Component\Validator\Constraints as Assert;
 use App\Validator\Constraints as CustomAssert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ProfileDto
 {

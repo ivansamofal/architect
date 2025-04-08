@@ -19,7 +19,7 @@ class Book
     private string $name;
 
     // Связь с автором
-    #[ORM\ManyToOne(targetEntity: Author::class, cascade: ["persist"])]
+    #[ORM\ManyToOne(targetEntity: Author::class, cascade: ['persist'])]
     private ?Author $author = null;
 
     #[ORM\Column]

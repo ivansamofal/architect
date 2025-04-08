@@ -13,13 +13,11 @@ class BookController extends AbstractController
     public function __construct(
         private readonly AuthorService $authorService,
         private readonly BookService $bookService,
-    )
-    {
+    ) {
     }
 
     /**
-     *
-     * #[Route('/authors')]
+     * #[Route('/authors')].
      */
     public function authorsList(Request $request): JsonResponse
     {
@@ -29,8 +27,7 @@ class BookController extends AbstractController
     }
 
     /**
-     *
-     * #[Route('/books/:id')]
+     * #[Route('/books/:id')].
      */
     public function getBooksByAuthor(int $authorId): JsonResponse
     {

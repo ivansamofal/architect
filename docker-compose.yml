@@ -161,10 +161,11 @@ services:
   blackfire:
     image: blackfire/blackfire
     ports:
-      - 8707
+      - "8307:8307"
     environment:
       BLACKFIRE_SERVER_ID: dd891ebf-1d38-4c3f-9ca2-4a0d965ffbf1
       BLACKFIRE_SERVER_TOKEN: fbcef191cbb8212e67b738233604fabc4a1770c3577ba19b540165fa7932ee5d
+      BLACKFIRE_DISABLE_LEGACY_PORT: 1
     networks:
       - architecht_network
 
@@ -237,6 +238,18 @@ services:
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411
       COLLECTOR_ZIPKIN_ENABLED: "true"
+    networks:
+      - architecht_network
+
+  webgrind:
+    image: jokkedk/webgrind
+    platform: linux/amd64
+    ports:
+      - "8081:80"
+    volumes:
+      - ./xdebug-profiler:/tmp
+    environment:
+      - WEBGRIND_PROFILER_DIR=/tmp
     networks:
       - architecht_network
 

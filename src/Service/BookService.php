@@ -7,7 +7,6 @@ use App\Factories\BookFactory;
 use App\Messages\LoadBooksMessage;
 use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -20,8 +19,7 @@ class BookService
         private readonly AuthorRepository $authorRepository,
         private readonly MessageBusInterface $bus,
         private readonly LoggerInterface $logger,
-    )
-    {
+    ) {
 
     }
 

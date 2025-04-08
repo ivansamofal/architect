@@ -44,3 +44,9 @@ node:
 
 tests-run:
 	php vendor/bin/phpunit
+
+webgrind:
+	docker exec -it architect-webgrind-1 bash
+
+unpack-profiles:
+	gunzip -f xdebug-profiler/*.gz

@@ -10,7 +10,6 @@ use App\Exceptions\UserNotCreatedException;
 use App\Factories\ProfileFactory;
 use App\Repository\ProfileRepository;
 use App\Service\Interfaces\ProfileServiceInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -27,8 +26,7 @@ class ProfileService implements ProfileServiceInterface
         private readonly TagAwareCacheInterface $cache,
         private readonly LoggerInterface $logger,
         private readonly EventDispatcherInterface $eventDispatcher,
-    )
-    {
+    ) {
 
     }
 
@@ -64,7 +62,7 @@ class ProfileService implements ProfileServiceInterface
         try {
             $profile = $this->prepareEntity($profileDto);
             $this->profileRepository->save($profile, true);
-            $this->cache->invalidateTags(['profiles']);//todo put into save?
+            $this->cache->invalidateTags(['profiles']); // todo put into save?
 
             $this->sendEvent($profile);
 
@@ -76,6 +74,7 @@ class ProfileService implements ProfileServiceInterface
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
+
             throw new UserNotCreatedException($e->getMessage());
         }
     }

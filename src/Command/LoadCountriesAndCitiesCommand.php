@@ -17,8 +17,7 @@ class LoadCountriesAndCitiesCommand extends Command
 {
     public function __construct(
         private readonly GeoService $geoService,
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -29,7 +28,7 @@ class LoadCountriesAndCitiesCommand extends Command
 
         $this->geoService->loadAndSaveGeoData();
 
-        $io->success("Geo data successfully loaded");
+        $io->success('Geo data successfully loaded');
 
         return Command::SUCCESS;
     }

@@ -55,10 +55,12 @@ services:
           $cache: '@Symfony\Contracts\Cache\TagAwareCacheInterface'
           $profileRepository: '@App\Repository\ProfileRepository'
       public: false
+      tags: [ 'app.traceable' ]
 
         # Decorated service registered as the alias for ProfileServiceInterface
     App\Service\ProfileServiceInterface:
-        alias: App\Decorator\TraceableProfileService
+       # alias: App\Decorator\TraceableProfileService
+      factory: ['App\Factory\TraceDecoratorFactory', 'decorate']
 
     # The TraceableProfileService depends on the original service. We can use the decorator pattern.
     App\Decorator\TraceableProfileService:
@@ -78,3 +80,6 @@ services:
     App\EventListener\JsonExceptionListener:
       tags:
         - { name: kernel.event_listener, event: kernel.exception }
+
+    OpenTelemetry\API\Trace\TracerInterface: '@jaeger.tracer'
+

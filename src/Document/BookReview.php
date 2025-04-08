@@ -10,10 +10,10 @@ class BookReview
     #[MongoDB\Id]
     private string $id;
 
-    #[MongoDB\Field(type: "int")]
+    #[MongoDB\Field(type: 'int')]
     private int $bookId;
 
-    #[MongoDB\Field(type: "collection")]
+    #[MongoDB\Field(type: 'collection')]
     private array $reviews = [];
 
     public function addReview(int $profileId, int $rating, string $comment): void
@@ -22,7 +22,7 @@ class BookReview
             'profileId' => $profileId,
             'rating' => $rating,
             'comment' => $comment,
-            'date' => new \DateTime()
+            'date' => new \DateTime(),
         ];
     }
 

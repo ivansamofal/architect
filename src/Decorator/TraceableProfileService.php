@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Decorator;
 
 use App\Dto\LocationDto;
 use App\Dto\ProfileDto;
 use App\Entity\Profile;
-use App\Service\Interfaces\ProfileServiceInterface;
 use App\Factories\JaegerTracerFactory;
+use App\Service\Interfaces\ProfileServiceInterface;
 use Psr\Log\LoggerInterface;
 
 class TraceableProfileService implements ProfileServiceInterface
@@ -32,12 +33,17 @@ class TraceableProfileService implements ProfileServiceInterface
     {
         $span = $this->tracer->spanBuilder($spanName)->startSpan();
         $span->setAttribute('method', $methodAttribute);
+        $span->setAttribute('memory_usage_start', (string) (memory_get_usage() / 1024 / 1024));
+        $span->setAttribute('memory_peak_usage_start', (string) (memory_get_peak_usage() / 1024 / 1024));
         try {
             $result = $callback();
         } finally {
+            $span->setAttribute('memory_usage_end', (string) (memory_get_usage() / 1024 / 1024));
+            $span->setAttribute('memory_peak_usage_end', (string) (memory_get_peak_usage() / 1024 / 1024));
             $span->end();
             $this->tracerProvider->forceFlush();
         }
+
         return $result;
     }
 
@@ -46,7 +52,7 @@ class TraceableProfileService implements ProfileServiceInterface
         return $this->withTrace(
             'handle_getList',
             '/api/profiles',
-            fn() => $this->decorated->getList()
+            fn () => $this->decorated->getList()
         );
     }
 
@@ -55,7 +61,7 @@ class TraceableProfileService implements ProfileServiceInterface
         return $this->withTrace(
             'handle_find',
             '/api/profile',
-            fn() => $this->decorated->find($id)
+            fn () => $this->decorated->find($id)
         );
     }
 
@@ -69,7 +75,7 @@ class TraceableProfileService implements ProfileServiceInterface
         return $this->withTrace(
             'handle_createProfile',
             '/api/profile/create',
-            fn() => $this->decorated->createProfile($profileDto)
+            fn () => $this->decorated->createProfile($profileDto)
         );
     }
 }

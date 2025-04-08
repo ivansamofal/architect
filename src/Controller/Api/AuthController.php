@@ -11,8 +11,7 @@ class AuthController extends AbstractController
 {
     public function __construct(
 
-    )
-    {
+    ) {
     }
 
     #[Route('/api/v1/login', name: 'api_login', methods: ['POST'])]

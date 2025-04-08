@@ -11,8 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProfileRepository::class)]
 class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface, UserInterface
@@ -55,12 +55,12 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     private ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Country::class)]
-    #[ORM\JoinColumn(name: 'country_id', referencedColumnName: 'id', nullable: true, onDelete: "SET NULL")]
+    #[ORM\JoinColumn(name: 'country_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     #[Ignore]
     private ?Country $country = null;
 
     #[ORM\ManyToOne(targetEntity: City::class)]
-    #[ORM\JoinColumn(name: 'city_id', referencedColumnName: 'id', nullable: true, onDelete: "SET NULL")]
+    #[ORM\JoinColumn(name: 'city_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     #[Ignore]
     private ?City $city = null;
 
@@ -81,11 +81,11 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     #[Ignore]
     private ?string $password = null;
 
-//    #[ORM\OneToMany(targetEntity: ProfileBook::class, mappedBy: 'profile', cascade: ['remove'])]
-//    private Collection $profileBooks;
-//
-//    #[ORM\OneToMany(targetEntity: ProfileInterest::class, mappedBy: 'profile', cascade: ['remove'])]
-//    private Collection $profileInterests;
+    //    #[ORM\OneToMany(targetEntity: ProfileBook::class, mappedBy: 'profile', cascade: ['remove'])]
+    //    private Collection $profileBooks;
+    //
+    //    #[ORM\OneToMany(targetEntity: ProfileInterest::class, mappedBy: 'profile', cascade: ['remove'])]
+    //    private Collection $profileInterests;
 
     #[ORM\OneToMany(targetEntity: ProfileProgrammingLanguage::class, mappedBy: 'profile', cascade: ['remove'])]
     private Collection $profileProgrammingLanguages;
@@ -111,6 +111,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -122,6 +123,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setSurname(string $surname): self
     {
         $this->surname = $surname;
+
         return $this;
     }
 
@@ -133,6 +135,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setLatitude(?string $latitude): self
     {
         $this->latitude = $latitude;
+
         return $this;
     }
 
@@ -144,6 +147,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setLongitude(?string $longitude): self
     {
         $this->longitude = $longitude;
+
         return $this;
     }
 
@@ -155,6 +159,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -166,6 +171,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setCountry(?Country $country): self
     {
         $this->country = $country;
+
         return $this;
     }
 
@@ -177,6 +183,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setCity(?City $city): self
     {
         $this->city = $city;
+
         return $this;
     }
 
@@ -188,6 +195,7 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setAvatarId(?int $avatar_id): self
     {
         $this->avatar_id = $avatar_id;
+
         return $this;
     }
 
@@ -199,12 +207,14 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setGender(?int $gender): self
     {
         $this->gender = $gender;
+
         return $this;
     }
 
     public function setPassword(string $password): self
     {
         $this->password = $password;
+
         return $this;
     }
 
@@ -216,12 +226,14 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
     public function setStatus(int $status): self
     {
         $this->status = $status;
+
         return $this;
     }
 
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -278,13 +290,13 @@ class Profile implements ArrayableInterface, PasswordAuthenticatedUserInterface,
         return $this->birthDate;
     }
 
-    #[Groups(["profile:read"])]
+    #[Groups(['profile:read'])]
     public function getCountryName(): ?string
     {
         return $this->country ? $this->country->getName() : null;
     }
 
-    #[Groups(["profile:read"])]
+    #[Groups(['profile:read'])]
     public function getCityName(): ?string
     {
         return $this->city ? $this->city->getName() : null;

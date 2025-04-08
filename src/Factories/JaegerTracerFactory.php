@@ -2,10 +2,10 @@
 
 namespace App\Factories;
 
-use OpenTelemetry\API\Trace\TracerInterface;
-use OpenTelemetry\SDK\Trace\TracerProvider;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use App\Service\Tracing\CustomJaegerExporter;
+use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use Psr\Log\LoggerInterface;
 
 class JaegerTracerFactory
@@ -29,6 +29,7 @@ class JaegerTracerFactory
             throw new \Exception('JAEGER_NAME is required');
         }
         $tracerProvider = self::createTracerProvider($logger);
+
         return $tracerProvider->getTracer($_ENV['JAEGER_NAME']);
     }
 }

@@ -19,26 +19,27 @@ class Country implements ArrayableInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["country:read"])]
+    #[Groups(['country:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["country:read"])]
+    #[Groups(['country:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 2)]
-    #[Groups(["country:read"])]
+    #[Groups(['country:read'])]
     private ?string $alpha2 = null;
 
     #[ORM\Column(length: 3)]
-    #[Groups(["country:read"])]
+    #[Groups(['country:read'])]
     private ?string $alpha3 = null;
 
-    #[ORM\OneToMany(targetEntity: City::class, mappedBy: "country", cascade: ["remove"])]
+    #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'country', cascade: ['remove'])]
     #[Ignore]
     private Collection $cities;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->cities = new ArrayCollection();
     }
 
@@ -108,9 +109,9 @@ class Country implements ArrayableInterface
     public function removeCity(City $city): self
     {
         if ($this->cities->removeElement($city)) {
-//            if ($city->getCountry() === $this) {//todo
-//                $city->setCountry(null);
-//            }
+            //            if ($city->getCountry() === $this) {//todo
+            //                $city->setCountry(null);
+            //            }
         }
 
         return $this;

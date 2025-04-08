@@ -8,7 +8,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class UniqueEmailValidator extends ConstraintValidator
 {
-    public function __construct(private ProfileService $profileService) {}
+    public function __construct(private ProfileService $profileService)
+    {
+    }
 
     public function validate($value, Constraint $constraint): void
     {

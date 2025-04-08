@@ -14,11 +14,11 @@ class ProfileInterest
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Profile::class)]
-    #[ORM\JoinColumn(name: "profile_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: 'profile_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Profile $profile = null;
 
     #[ORM\ManyToOne(targetEntity: Interest::class)]
-    #[ORM\JoinColumn(name: "interest_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: 'interest_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Interest $interest = null;
 
     public function getId(): ?int

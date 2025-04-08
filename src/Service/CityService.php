@@ -15,7 +15,7 @@ class CityService
     {
         $city = $this->cityRepository->find($id);
 
-        if ($city === null) {
+        if (null === $city) {
             throw new \Exception('City not found');
         }
 

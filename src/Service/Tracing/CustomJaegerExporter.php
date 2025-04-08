@@ -4,29 +4,24 @@ declare(strict_types=1);
 
 namespace App\Service\Tracing;
 
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use OpenTelemetry\SDK\Trace\SpanDataInterface;
-use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Future\FutureInterface;
+use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Psr\Log\LoggerInterface;
 
 class CustomJaegerExporter implements SpanExporterInterface
 {
     private string $endpoint;
 
-    /**
-     *
-     * @param string $endpoint
-     */
     public function __construct(string $endpoint, private readonly LoggerInterface $logger)
     {
         $this->endpoint = $endpoint;
     }
 
     /**
-     *
      * @param iterable<SpanDataInterface> $batch
-     * @param CancellationInterface|null $cancellation
+     *
      * @return FutureInterface<bool>
      */
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
@@ -34,9 +29,11 @@ class CustomJaegerExporter implements SpanExporterInterface
         $payload = $this->mapPayload($batch);
         try {
             $success = $this->sendRequest($payload);
+
             return new ImmediateFuture($success);
         } catch (\Throwable $e) {
             $this->logger->error("Error during sending request to jaeger. cause: {$e->getMessage()}");
+
             return new ImmediateFuture(ExporterResultCode::FAILED_NOT_RETRYABLE);
         }
     }
@@ -54,24 +51,24 @@ class CustomJaegerExporter implements SpanExporterInterface
     private function sendRequest(array $payload): int
     {
         $jsonPayload = json_encode($payload);
-        if ($jsonPayload === false) {
+        if (false === $jsonPayload) {
             throw new \Exception('Invalid JSON in Jaeger sendRequest');
         }
 
         $ch = curl_init($this->endpoint);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPayload);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Content-Length: ' . strlen($jsonPayload)
+            'Content-Length: '.strlen($jsonPayload),
         ]);
 
         $result = curl_exec($ch);
-        if ($result === false) {
+        if (false === $result) {
             $error = curl_error($ch);
-            $this->logger->error("cURL error jaeger: " . $error);
-            error_log("cURL error: " . $error);
+            $this->logger->error('cURL error jaeger: '.$error);
+            error_log('cURL error: '.$error);
         }
 
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -90,7 +87,7 @@ class CustomJaegerExporter implements SpanExporterInterface
             $spanContext = $span->getContext();
             $parentContext = $span->getParentContext();
             $timestamp = (int) ($span->getStartEpochNanos() / 1000);
-            $duration  = (int) (($span->getEndEpochNanos() - $span->getStartEpochNanos()) / 1000);
+            $duration = (int) (($span->getEndEpochNanos() - $span->getStartEpochNanos()) / 1000);
 
             $payload[] = [
                 'traceId' => $spanContext->getTraceId(),

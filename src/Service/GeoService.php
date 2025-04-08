@@ -12,9 +12,8 @@ class GeoService
     public function __construct(
         private readonly CountryService $countryService,
         private readonly CityService $cityService,
-        private readonly ParameterBagInterface $params
-    )
-    {
+        private readonly ParameterBagInterface $params,
+    ) {
 
     }
 
@@ -33,9 +32,18 @@ class GeoService
             throw new \Exception('URL for geo is required!');
         }
 
-        $response = $client->request('GET', $url, ['timeout' => 60]);
+        if (empty($_ENV['GO_API_TOKEN'])) {
+            throw new \Exception('Api token for geo is required!');
+        }
 
-        if ($response->getStatusCode() !== 200) {
+        $response = $client->request('GET', $url, [
+            'timeout' => 60,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $_ENV['GO_API_TOKEN'],
+            ],
+        ]);
+
+        if (200 !== $response->getStatusCode()) {
             throw new \Exception('incorrect response from geo microservice');
         }
 
@@ -58,8 +66,7 @@ class GeoService
             }
         }
 
-        $this->countryService->saveAll($countries);//todo chanks
-        $this->cityService->saveAll($cities);//todo chanks
+        $this->countryService->saveAll($countries); // todo chanks
+        $this->cityService->saveAll($cities); // todo chanks
     }
-
 }

@@ -8,7 +8,9 @@ use Symfony\Component\Notifier\NotifierInterface;
 
 class NotifyService
 {
-    public function __construct(private readonly NotifierInterface $notifier, private readonly LoggerInterface $logger,) {}
+    public function __construct(private readonly NotifierInterface $notifier, private readonly LoggerInterface $logger)
+    {
+    }
 
     public function sendNotice(string $message): void
     {

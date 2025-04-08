@@ -10,7 +10,7 @@ class ElasticsearchClientFactory
     public static function create(): Client
     {
         return ClientBuilder::create()
-            ->setHosts(['elasticsearch:9200'])//todo env
+            ->setHosts(['elasticsearch:9200'])// todo env
             ->build();
     }
 }

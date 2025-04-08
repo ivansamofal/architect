@@ -55,6 +55,7 @@ class ProfileRepository extends ServiceEntityRepository
     public function findAllActive(): array
     {
         $activeStatus = 1;
+
         return $this->createQueryBuilder('p')
             ->select('p', 'pb', 'b', 'pi', 'i')
             ->leftJoin('p.profileBooks', 'pb')

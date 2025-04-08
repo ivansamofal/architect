@@ -4,16 +4,15 @@ namespace App\Tests\Unit;
 
 use App\Entity\Profile;
 use App\Repository\ProfileRepository;
+use App\Service\CityService;
+use App\Service\CountryService;
 use App\Service\ProfileService;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 use Psr\Log\LoggerInterface;
-use App\Service\CountryService;
-use App\Service\CityService;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ProfileServiceTest extends TestCase
 {
@@ -44,6 +43,7 @@ class ProfileServiceTest extends TestCase
                 $itemMock = $this->createMock(ItemInterface::class);
                 $itemMock->expects($this->any())->method('expiresAfter')->with(3600);
                 $itemMock->expects($this->any())->method('tag')->with(['profiles']);
+
                 return $callback($itemMock);
             });
 

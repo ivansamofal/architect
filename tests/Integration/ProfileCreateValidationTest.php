@@ -14,12 +14,12 @@ class ProfileCreateValidationTest extends WebTestCase
         ]);
 
         $invalidPayload = [
-            "surname" => "Will",
-            "password" => "short",
-            "status" => 1,
-            "countryCode" => "USA", //wrong length
-            "cityId" => 131,
-            "birthDate" => "2025-03-01"
+            'surname' => 'Will',
+            'password' => 'short',
+            'status' => 1,
+            'countryCode' => 'USA', // wrong length
+            'cityId' => 131,
+            'birthDate' => '2025-03-01',
         ];
 
         $client->request(
@@ -28,12 +28,12 @@ class ProfileCreateValidationTest extends WebTestCase
             [],
             [],
             ['CONTENT_TYPE' => 'application/json',
-                'HTTP_ACCEPT' => 'application/json',],
+                'HTTP_ACCEPT' => 'application/json', ],
             json_encode($invalidPayload)
         );
 
         $response = $client->getResponse();
-//        $this->assertEquals(400, $response->getStatusCode(), 'An error occurred');
+        //        $this->assertEquals(400, $response->getStatusCode(), 'An error occurred');
 
         $content = $response->getContent();
         $this->assertJson($content, 'An error occurred');
@@ -41,10 +41,10 @@ class ProfileCreateValidationTest extends WebTestCase
         $data = json_decode($content, true);
 
         $this->assertIsArray($data);
-//        $this->assertArrayHasKey('email', $data, 'Expects error with field email');
-//        $this->assertArrayHasKey('name', $data, 'Expects error with field name');
-//        $this->assertArrayHasKey('countryCode', $data, 'Expects error with field countryCode');
-//        $this->assertArrayHasKey('birthDate', $data, 'Expects error with field birthDate');
+        //        $this->assertArrayHasKey('email', $data, 'Expects error with field email');
+        //        $this->assertArrayHasKey('name', $data, 'Expects error with field name');
+        //        $this->assertArrayHasKey('countryCode', $data, 'Expects error with field countryCode');
+        //        $this->assertArrayHasKey('birthDate', $data, 'Expects error with field birthDate');
     }
 
     public function testInvalidDate(): void
@@ -52,12 +52,12 @@ class ProfileCreateValidationTest extends WebTestCase
         $client = static::createClient();
 
         $invalidPayload = [
-            "surname" => "Will",
-            "password" => "short",
-            "status" => 1,
-            "countryCode" => "USA", // wrong length
-            "cityId" => 131,
-            "birthDate" => "invalid-date"
+            'surname' => 'Will',
+            'password' => 'short',
+            'status' => 1,
+            'countryCode' => 'USA', // wrong length
+            'cityId' => 131,
+            'birthDate' => 'invalid-date',
         ];
 
         $client->request(
@@ -65,7 +65,7 @@ class ProfileCreateValidationTest extends WebTestCase
             '/api/v1/profiles',
             [],
             [],
-            ['CONTENT_TYPE' => 'application/json','HTTP_ACCEPT' => 'application/json'],
+            ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json'],
             json_encode($invalidPayload)
         );
 

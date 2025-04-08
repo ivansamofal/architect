@@ -3,22 +3,23 @@
 namespace App\Controller\Api;
 
 use App\Decorator\TraceableProfileService;
+use App\Decorator\TraceDecorator;
 use App\Dto\ProfileDto;
 use App\Exceptions\UserNotCreatedException;
 use App\Service\ProfileService;
+use OpenTelemetry\API\Trace\TracerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 class ProfileController extends AbstractController
 {
     public function __construct(
 //        private readonly ProfileService $profileService,
+        private readonly TracerInterface $traceableService,
         private readonly TraceableProfileService $profileService,
         private readonly LoggerInterface $logger,
-    )
-    {
+    ) {
     }
 
     public function index(): JsonResponse
@@ -35,8 +36,7 @@ class ProfileController extends AbstractController
     }
 
     /**
-     *
-     * #[Route('/profiles/{id}')]
+     * #[Route('/profiles/{id}')].
      */
     public function get(int $id): JsonResponse
     {
@@ -46,8 +46,7 @@ class ProfileController extends AbstractController
     }
 
     /**
-     *
-     * #[Route('/profiles')]
+     * #[Route('/profiles')].
      */
     public function create(ProfileDto $profileDto): JsonResponse
     {

@@ -20,11 +20,11 @@ final class Version20250311225637 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql("
-            
             CREATE SEQUENCE author_id_seq START 1;
             ALTER TABLE author ALTER COLUMN id SET DEFAULT nextval('author_id_seq');
             CREATE SEQUENCE book_id_seq START 1;
             ALTER TABLE book ALTER COLUMN id SET DEFAULT nextval('book_id_seq');
+            ALTER TABLE country ALTER COLUMN id SET DEFAULT NEXTVAL('country_id_seq');
         ");
 
         $this->addSql('DROP INDEX uniq_2d5b0234f92f3e70');
